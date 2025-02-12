@@ -47,11 +47,7 @@ def is_otp_secret_valid(secret):
     return True
 
 
-def get_hotp_key(key=None, secret=None, hexkey=None):
-    if hexkey:
-        key = hexkey.decode('hex')
-    if secret:
-        secret = secret.replace(' ', '')
-        secret = pad_base32_str(secret, '=')
-        key = base64.b32decode(secret, casefold=True)
-    return key
+def get_hotp_key(secret):
+    secret = secret.replace(' ', '')
+    secret = pad_base32_str(secret, '=')
+    return base64.b32decode(secret, casefold=True)
