@@ -469,88 +469,90 @@ Acknowledgments
 		<key>0C69FA9F-6875-40F5-ADFB-CD20428410A0</key>
 		<dict>
 			<key>xpos</key>
-			<integer>700</integer>
+			<real>700</real>
 			<key>ypos</key>
 			<real>650</real>
 		</dict>
 		<key>1086994E-3BDA-4202-8551-27D286CC5E7A</key>
 		<dict>
 			<key>xpos</key>
-			<integer>700</integer>
+			<real>700</real>
 			<key>ypos</key>
-			<real>10</real>
+			<real>15</real>
 		</dict>
 		<key>3859F17F-F608-473F-B690-DDAB90827E02</key>
 		<dict>
 			<key>xpos</key>
-			<integer>500</integer>
+			<real>500</real>
 			<key>ypos</key>
 			<real>650</real>
 		</dict>
 		<key>7BEE3C7D-A99B-42F8-BCB9-BC625434942E</key>
 		<dict>
 			<key>xpos</key>
-			<integer>300</integer>
+			<real>300</real>
 			<key>ypos</key>
 			<real>520</real>
 		</dict>
 		<key>7DD3BDE5-A157-42E5-9376-F681FB50A4EE</key>
 		<dict>
 			<key>xpos</key>
-			<integer>300</integer>
+			<real>300</real>
 			<key>ypos</key>
 			<real>400</real>
 		</dict>
 		<key>8D4FBD76-2AC8-4B24-A980-15CEA567F80A</key>
 		<dict>
 			<key>xpos</key>
-			<integer>500</integer>
+			<real>500</real>
 			<key>ypos</key>
 			<real>770</real>
 		</dict>
 		<key>9C87E9F8-DFE4-4A19-AE02-F468FE5DA32B</key>
 		<dict>
 			<key>xpos</key>
-			<integer>700</integer>
+			<real>700</real>
 			<key>ypos</key>
 			<real>150</real>
 		</dict>
 		<key>C74DB286-B179-49BB-947D-91B3706ADB20</key>
 		<dict>
 			<key>xpos</key>
-			<integer>700</integer>
+			<real>700</real>
 			<key>ypos</key>
 			<real>330</real>
 		</dict>
 		<key>C7915157-5379-4CCC-9076-D0918BB66AB0</key>
 		<dict>
 			<key>xpos</key>
-			<integer>500</integer>
+			<real>500</real>
 			<key>ypos</key>
 			<real>400</real>
 		</dict>
 		<key>D28AB140-ED93-4395-AD40-4A240B9BDD8D</key>
 		<dict>
 			<key>xpos</key>
-			<integer>700</integer>
+			<real>700</real>
 			<key>ypos</key>
 			<real>470</real>
 		</dict>
 		<key>D2D03A99-8E4B-4042-896C-4126662B8CD4</key>
 		<dict>
 			<key>xpos</key>
-			<integer>500</integer>
+			<real>500</real>
 			<key>ypos</key>
 			<real>80</real>
 		</dict>
 		<key>EBE66B7E-A102-4C7D-8E1E-FFC0D86ADF1F</key>
 		<dict>
 			<key>xpos</key>
-			<integer>700</integer>
+			<real>700</real>
 			<key>ypos</key>
 			<real>770</real>
 		</dict>
 	</dict>
+	<key>userconfigurationconfig</key>
+	<array/>
 	<key>variablesdontexport</key>
 	<array/>
 	<key>version</key>
