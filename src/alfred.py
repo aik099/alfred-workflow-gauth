@@ -87,10 +87,20 @@ def write(text):
 
 
 def xml(items, maxresults=_MAX_RESULTS_DEFAULT):
-    root = Element('items')
+    root_element = Element('output')
+
+    rerun_element = Element('rerun')
+    rerun_element.text = '5'
+    root_element.append(rerun_element)
+
+    items_element = Element('items')
+
     for item in itertools.islice(items, maxresults):
-        root.append(item.xml())
-    return tostring(root, encoding='utf-8')
+        items_element.append(item.xml())
+
+    root_element.append(items_element)
+
+    return tostring(root_element, encoding='utf-8')
 
 
 def _create(path):
