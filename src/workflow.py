@@ -20,7 +20,7 @@ class AlfredGAuth(alfred.AlfredWorkflow):
 
     _reserved_words = ['add', 'update', 'remove']
 
-    def __init__(self, config_file='~/.gauth', max_results=20):
+    def __init__(self, config_file='~/.gauth', max_results=21):
         self.max_results = max_results
 
         self._config_file = config_file
@@ -109,6 +109,10 @@ class AlfredGAuth(alfred.AlfredWorkflow):
             if entry:
                 yield entry
                 i += 1
+
+                # Ensure that there is space for the "Time Remaining..." item.
+                if i == self.max_results - 1:
+                    break
         if i > 0:
             yield self.time_remaining_item()
         else:
