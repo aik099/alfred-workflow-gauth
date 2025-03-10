@@ -17,15 +17,9 @@ A bigger list is available on [Wikipedia](http://en.wikipedia.org/wiki/Two-step_
 Installation
 ------------
 
-Create a `~/.gauth` file with your secrets, ie:
-
-```ini
-[google - bob@gmail.com]
-secret=xxxxxxxxxxxxxxxxxx
-
-[evernote - robert]
-secret=yyyyyyyyyyyyyyyyyy
-```
+1. activate the workflow entry in the Alfred Search bar by typing `gauth`
+2. use the provided wizard for creating/unlocking `alfred-gauth` Apple Keychain
+3. if you've stored your secrets in the `~/.gauth` file (plain-text) then migrate your data using the wizard
 
 [Download](https://github.com/moul/alfred-workflow-gauth/raw/master/Google%20Authenticator.alfredworkflow) and import to Alfred
 
