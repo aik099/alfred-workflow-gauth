@@ -187,4 +187,3 @@ class AlfredWorkflow(object):
             command = command.strip()
         return command in self._reserved_words or \
             hasattr(self, 'do_{}'.format(command))
-

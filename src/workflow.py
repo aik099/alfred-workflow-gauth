@@ -60,7 +60,8 @@ class AlfredGAuth(alfred.AlfredWorkflow):
             yield self.time_remaining_item()
         else:
             yield self.warning_item('Account not found',
-                                    f'There is no account matching "{query}" on your Apple Keychain.')
+                                    f'There is no account matching "{query}" '
+                                    f'on your Apple Keychain.')
 
     def do_search_by_account(self, query):
         if not self._init_storage() or self._handle_empty_storage():
@@ -73,9 +74,10 @@ class AlfredGAuth(alfred.AlfredWorkflow):
 
         if state == AppleKeychainStorage.STATE_KEYCHAIN_MISSING:
             item = alfred.Item({u'uid': 0, u'arg': 'create_storage'},
-                                       'Create Apple Keychain',
-                                       'No Apple Keychain found. A new one will be created on the next step.',
-                                       'warning.png')
+                               'Create Apple Keychain',
+                               'No Apple Keychain found. '
+                               'A new one will be created on the next step.',
+                               'warning.png')
             self.write_item(item)
 
             return False
@@ -83,7 +85,8 @@ class AlfredGAuth(alfred.AlfredWorkflow):
         if state == AppleKeychainStorage.STATE_KEYCHAIN_LOCKED:
             item = alfred.Item({u'uid': 0, u'arg': 'unlock_storage'},
                                'Unlock Apple Keychain',
-                               'Apple Keychain is locked. Enter its password on the next step.',
+                               'Apple Keychain is locked. '
+                               'Enter its password on the next step.',
                                'warning.png')
             self.write_item(item)
 
@@ -95,20 +98,29 @@ class AlfredGAuth(alfred.AlfredWorkflow):
         keychain_name = self._storage.get_keychain_name()
 
         if self._storage.create_keychain():
-            self.write_text(f'Apple Keychain Created|Apple Keychain "{keychain_name}" is now ready for use.')
+            self.write_text(f'Apple Keychain Created|'
+                            f'Apple Keychain "{keychain_name}" is now ready '
+                            f'for use.')
         else:
-            self.write_text(f'Apple Keychain Not Created|The process was canceled. Apple Keychain "{keychain_name}" was not created.')
+            self.write_text(
+                f'Apple Keychain Not Created|The process was canceled. '
+                f'Apple Keychain "{keychain_name}" was not created.')
 
     def do_unlock_storage(self, query):
         keychain_name = self._storage.get_keychain_name()
 
         if self._storage.unlock_keychain():
-            self.write_text(f'Apple Keychain Unlocked|Apple Keychain "{keychain_name}" is now accessible.')
+            self.write_text(f'Apple Keychain Unlocked|'
+                            f'Apple Keychain "{keychain_name}" '
+                            f'is now accessible.')
         else:
-            self.write_text(f'Failed to unlock Apple Keychain|The process was canceled. Apple Keychain "{keychain_name}" remains locked.')
+            self.write_text(
+                f'Failed to unlock Apple Keychain|The process was canceled. '
+                f'Apple Keychain "{keychain_name}" remains locked.')
 
     def _handle_empty_storage(self):
-        # Don't recommend migration from Plain-text, when user already started using Apple Keychain.
+        # Don't recommend migration from Plain-text,
+        # when user already started using Apple Keychain.
         if not self._storage.is_empty():
             return False
 
@@ -117,16 +129,19 @@ class AlfredGAuth(alfred.AlfredWorkflow):
         # No data to migrate.
         if not migration_assistant.can_migrate:
             item = self.warning_item(title='GAuth is not yet configured',
-                                     message='You must use "Add a new secret" to add your secrets into Apple Keychain.')
+                                     message='You must use "Add a new secret" '
+                                             'to add your secrets into '
+                                             'Apple Keychain.')
             self.write_item(item)
 
             return True
 
         source_storage_file = migration_assistant.get_source_storage_file()
         item = alfred.Item({u'uid': 0, u'arg': 'migrate_storage'},
-                                   'Migrate 2FA accounts to Apple Keychain',
-                                   f'Removes "{source_storage_file}" file after migration.',
-                                   'warning.png')
+                           'Migrate 2FA accounts to Apple Keychain',
+                           f'Removes "{source_storage_file}" file '
+                           f'after migration.',
+                           'warning.png')
         self.write_item(item)
 
         return True
@@ -138,7 +153,10 @@ class AlfredGAuth(alfred.AlfredWorkflow):
             migrated_account_count = migration_assistant.migrate()
 
             source_storage_file = migration_assistant.get_source_storage_file()
-            self.write_text(f'Migration results|Migrated {migrated_account_count} accounts. The "{source_storage_file}" file was removed.')
+            self.write_text(
+                f'Migration results|'
+                f'Migrated {migrated_account_count} accounts. '
+                f'The "{source_storage_file}" file was removed.')
         except StorageError as e:
             self.write_text(f'Migration results|Error: {e}')
 
@@ -146,7 +164,8 @@ class AlfredGAuth(alfred.AlfredWorkflow):
         keychain_state = self._storage.get_keychain_state()
 
         if keychain_state != AppleKeychainStorage.STATE_KEYCHAIN_UNLOCKED:
-            self.write_text(f'Account creation failed|Apple Keychain is {keychain_state}.')
+            self.write_text(f'Account creation failed|'
+                            f'Apple Keychain is {keychain_state}.')
 
             return
 
@@ -156,15 +175,17 @@ class AlfredGAuth(alfred.AlfredWorkflow):
             secret = secret.strip()
         except ValueError:
             self.write_text('Account creation failed|Invalid arguments!\n'
-                                   'Please enter: account, secret.')
+                            'Please enter: account, secret.')
 
             return
 
         try:
             if self._storage.add_account(account, secret):
-                self.write_text(f'Account creation succeeded|A new "{account}" account was added.')
+                self.write_text(f'Account creation succeeded|'
+                                f'A new "{account}" account was added.')
             else:
-                self.write_text(f'Account creation failed|Account "{account}" already exists.')
+                self.write_text(f'Account creation failed|'
+                                f'Account "{account}" already exists.')
         except StorageError as e:
             self.write_text(f'Account creation failed|Error:{e}')
 
@@ -172,7 +193,8 @@ class AlfredGAuth(alfred.AlfredWorkflow):
         keychain_state = self._storage.get_keychain_state()
 
         if keychain_state != AppleKeychainStorage.STATE_KEYCHAIN_UNLOCKED:
-            self.write_text(f'QRCode generation failed|Apple Keychain is {keychain_state}.')
+            self.write_text(f'QRCode generation failed|'
+                            f'Apple Keychain is {keychain_state}.')
 
             return
 
@@ -180,9 +202,11 @@ class AlfredGAuth(alfred.AlfredWorkflow):
 
         try:
             self._storage.generate_account_qrcode(query, filename)
-            self.write_text(f'QRCode was generated successfully|Filename: {filename}')
+            self.write_text(f'QRCode was generated successfully|'
+                            f'Filename: {filename}')
         except StorageError as e:
             self.write_text(f'QRCode generation failed|Error:{e}')
+
 
 def main(action, query):
     alfred_gauth = AlfredGAuth()

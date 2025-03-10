@@ -13,14 +13,17 @@ class AppleKeychainStorage:
     STATE_KEYCHAIN_LOCKED = 'locked'
     STATE_KEYCHAIN_UNLOCKED = 'unlocked'
 
-    def __init__(self, name = 'alfred-gauth'):
+    def __init__(self, name='alfred-gauth'):
         self._data = {}
         self._name = name
         self._file = name + '.keychain-db'
         self._state = None
 
         if self._keychain_exists():
-            self._state = self.STATE_KEYCHAIN_LOCKED if self._keychain_locked() else self.STATE_KEYCHAIN_UNLOCKED
+            self._state = (
+                self.STATE_KEYCHAIN_LOCKED
+                if self._keychain_locked() else self.STATE_KEYCHAIN_UNLOCKED
+            )
         else:
             self._state = self.STATE_KEYCHAIN_MISSING
 
@@ -35,16 +38,23 @@ class AppleKeychainStorage:
 
     def create_keychain(self):
         if self._keychain_exists():
-            raise StorageError(f'Apple Keychain "{self._name}" already exists.')
+            raise StorageError(
+                f'Apple Keychain "{self._name}" already exists.'
+            )
 
         try:
             # Create the keychain.
-            self._run_command(['security', 'create-keychain', '-P', self._file])
+            self._run_command(
+                ['security', 'create-keychain', '-P', self._file]
+            )
 
-            # Align a keychain settings with the 'login' keychain (no-timeout & no-lock-on-sleep).
-            self._run_command(['security', 'set-keychain-settings', self._file])
+            # Align the keychain settings with the 'login' keychain
+            # (no-timeout & no-lock-on-sleep).
+            self._run_command(
+                ['security', 'set-keychain-settings', self._file]
+            )
 
-            # Make a keychain accessible from the "Keychain Access" app.
+            # Make the keychain accessible from the "Keychain Access" app.
             self._add_to_keychain_access_app()
         except StorageError:
             return False
@@ -61,11 +71,15 @@ class AppleKeychainStorage:
         # Removes duplicates.
         user_keychains = list(set(user_keychains))
 
-        self._run_command(['security', 'list-keychains', '-d', 'user', '-s'] + user_keychains)
+        self._run_command(
+            ['security', 'list-keychains', '-d', 'user', '-s'] + user_keychains
+        )
 
     def _get_user_keychains(self):
         results = []
-        lines = self._run_command(['security', 'list-keychains', '-d', 'user'])
+        lines = self._run_command(
+            ['security', 'list-keychains', '-d', 'user']
+        )
 
         for line in lines:
             results.append(line.strip('" '))
@@ -73,7 +87,8 @@ class AppleKeychainStorage:
         return results
 
     def _keychain_exists(self):
-        # The "security list-keychains -d user" only shows keychains from the "Keychain Access" app.
+        # The "security list-keychains -d user" command
+        # only shows keychains from the "Keychain Access" app.
         return os.path.isfile(self._get_resolved_file())
 
     def _get_resolved_file(self):
@@ -81,10 +96,14 @@ class AppleKeychainStorage:
 
     def unlock_keychain(self):
         if not self._keychain_locked():
-            raise StorageError(f'Apple Keychain "{self._name}" is already unlocked.')
+            raise StorageError(
+                f'Apple Keychain "{self._name}" is already unlocked.'
+            )
 
         try:
-            self._run_command(['security', 'unlock-keychain', '-u', self._file])
+            self._run_command(
+                ['security', 'unlock-keychain', '-u', self._file]
+            )
         except StorageError:
             return False
 
@@ -95,7 +114,9 @@ class AppleKeychainStorage:
 
     def _keychain_locked(self):
         try:
-            self._run_command(['security', 'unlock-keychain', '-p', '', self._file])
+            self._run_command(
+                ['security', 'unlock-keychain', '-p', '', self._file]
+            )
         except StorageError:
             return True
 
@@ -106,9 +127,14 @@ class AppleKeychainStorage:
 
         try:
             with open(absolute_filename, 'w') as outfile:
-                subprocess.run(['qr', self._get_account_uri(account)], stdout=outfile)
+                subprocess.run(
+                    ['qr', self._get_account_uri(account)], stdout=outfile
+                )
         except FileNotFoundError as e:
-            raise StorageError('Run this command to install needed libraries\npip install "qrcode[pil]') from e
+            raise StorageError(
+                'Run this command to install needed libraries\n'
+                'pip install "qrcode[pil]"'
+            ) from e
         except subprocess.CalledProcessError as e:
             raise StorageError(f'QRCode generation failed ({e})') from e
 
@@ -118,9 +144,15 @@ class AppleKeychainStorage:
         try:
             issuer, username = account.split(' - ', 1)
         except ValueError:
-            raise StorageError('Account must be in "issuer - username" format for QRCode generation.')
+            raise StorageError(
+                'Account must be in "issuer - username" format '
+                'for QRCode generation.'
+            )
 
-        return f'otpauth://totp/{quote(issuer)}:{quote(username)}?secret={quote(secret)}&issuer={quote(issuer)}'
+        return (
+            f'otpauth://totp/{quote(issuer)}:{quote(username)}?'
+            f'secret={quote(secret)}&issuer={quote(issuer)}'
+        )
 
     def is_empty(self):
         self._assert_keychain_accessible()
@@ -144,12 +176,23 @@ class AppleKeychainStorage:
         self._assert_keychain_accessible()
 
         if not otp.is_otp_secret_valid(secret):
-            raise StorageError(f'Account "{account}" has invalid secret:\n{secret}')
+            raise StorageError(
+                f'Account "{account}" has invalid secret:\n{secret}'
+            )
 
         if account in self._data:
             return False
 
-        self._run_command(['security', 'add-generic-password', '-a', self._name, '-s', account, '-w', secret, self._file])
+        self._run_command(
+            [
+                'security',
+                'add-generic-password',
+                '-a', self._name,
+                '-s', account,
+                '-w', secret,
+                self._file,
+            ]
+        )
         self._data[account] = secret
 
         return True
@@ -160,12 +203,22 @@ class AppleKeychainStorage:
         if account not in self._data:
             raise StorageError(f'Account "{account}" not found.')
 
-        self._run_command(['security', 'delete-generic-password', '-a', self._name, '-s', account, self._file])
+        self._run_command(
+            [
+                'security',
+                'delete-generic-password',
+                '-a', self._name,
+                '-s', account,
+                self._file,
+            ]
+        )
         del self._data[account]
 
     def _assert_keychain_accessible(self):
         if self._state != self.STATE_KEYCHAIN_UNLOCKED:
-            raise StorageError(f'Apple Keychain "{self._name}" is {self._state}.')
+            raise StorageError(
+                f'Apple Keychain "{self._name}" is {self._state}.'
+            )
 
     def _read_storage(self):
         self._data = self._parse(self._dump())
@@ -173,7 +226,9 @@ class AppleKeychainStorage:
     def _dump(self):
         self._assert_keychain_accessible()
 
-        return self._run_command(['security', 'dump-keychain', '-d', self._file])
+        return self._run_command(
+            ['security', 'dump-keychain', '-d', self._file]
+        )
 
     def _parse(self, raw_dump_data):
         account = None
@@ -205,10 +260,15 @@ class AppleKeychainStorage:
         return results
 
     def _run_command(self, command):
-        # print('Executing command: ' + ' '.join(command) + '\n', file=sys.stderr)
+        # print('Executing command: ' + ' '.join(command) + '\n',
+        #       file=sys.stderr)
 
         try:
-            result = subprocess.run(command, capture_output=True, text=True, check=True)
+            result = subprocess.run(
+                command, capture_output=True, text=True, check=True
+            )
             return result.stdout.splitlines()
         except subprocess.CalledProcessError as e:
-            raise StorageError(f'Error executing security command: {e}') from e
+            raise StorageError(
+                f'Error executing security command: {e}'
+            ) from e

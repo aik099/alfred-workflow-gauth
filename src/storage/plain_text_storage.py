@@ -17,7 +17,8 @@ class PlainTextStorage:
         try:
             self._config.read(self._absolute_storage_path)
         except Exception as e:
-            raise StorageError(f'File "{config_file}" syntax is invalid.') from e
+            raise StorageError(f'File "{config_file}" '
+                               f'syntax is invalid.') from e
 
         self._accounts = self._config.sections()
 
