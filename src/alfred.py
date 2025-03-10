@@ -146,7 +146,7 @@ class AlfredWorkflow(object):
         return Item({
             u'uid': get_uid(uid),
             u'arg': '',
-            u'ignore': 'yes'
+            u'valid': 'no'
         }, title, message, icon)
 
     def warning_item(self, title, message, uid=0):

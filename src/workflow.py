@@ -87,7 +87,7 @@ class AlfredGAuth(alfred.AlfredWorkflow):
         # The uid for the remaining time will be the current time,
         # so it will appears always at the last position in the list
         time_remaining = otp.get_totp_time_remaining()
-        return alfred.Item({u'uid': time.time(), u'arg': '', u'ignore': 'yes'},
+        return alfred.Item({u'uid': time.time(), u'arg': '', u'valid': 'no'},
                            'Time Remaining: {}s'.format(time_remaining),
                            None, 'time.png')
 
