@@ -27,8 +27,8 @@ jobs:
 
       - name: Install dependencies
         run: |
-            pip install pep8
+            install pycodestyle
 
       - name: Run tests
         run: |
-          pep8 src/*.py
+          pycodestyle src/*.py
