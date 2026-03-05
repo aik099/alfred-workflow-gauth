@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-
+import hashlib
 import time
 
 import alfred
@@ -49,7 +49,8 @@ class AlfredGAuth(alfred.AlfredWorkflow):
                 continue
 
             token = self.config_get_account_token(account)
-            yield self.account_item(uid=i, account=account, token=token)
+            uid = hashlib.md5(account.encode()).hexdigest()
+            yield self.account_item(uid=uid, account=account, token=token)
             i += 1
 
             # Ensure that there is space for the "Time Remaining..." item.
