@@ -1,3 +1,5 @@
+import ctypes
+import ctypes.util
 import os
 import subprocess
 import re
@@ -12,6 +14,9 @@ class AppleKeychainStorage:
     STATE_KEYCHAIN_MISSING = 'missing'
     STATE_KEYCHAIN_LOCKED = 'locked'
     STATE_KEYCHAIN_UNLOCKED = 'unlocked'
+
+    _SECURITY_FRAMEWORK = ctypes.CDLL(ctypes.util.find_library('Security'))
+    _KEYCHAIN_STATUS_UNLOCKED_BIT = 1
 
     def __init__(self, name='alfred-gauth'):
         self._data = {}
@@ -113,14 +118,40 @@ class AppleKeychainStorage:
         return True
 
     def _keychain_locked(self):
-        try:
-            self._run_command(
-                ['security', 'unlock-keychain', '-p', '', self._file]
-            )
-        except StorageError:
+        # Worked before macOS 26.6.1 (Tahoe) only.
+        # try:
+        #     self._run_command(
+        #         ['security', 'unlock-keychain', '-p', '', self._file]
+        #     )
+        # except StorageError:
+        #     return True
+        #
+        # return False
+
+        # Always worked.
+        keychain_ref = ctypes.c_void_p()
+        status = self._SECURITY_FRAMEWORK.SecKeychainOpen(
+            self._get_resolved_file().encode('utf-8'),
+            ctypes.byref(keychain_ref),
+        )
+
+        # Failed to open the keychain.
+        if status != 0:
             return True
 
-        return False
+        keychain_status = ctypes.c_uint32()
+        status = self._SECURITY_FRAMEWORK.SecKeychainGetStatus(
+            keychain_ref, ctypes.byref(keychain_status)
+        )
+        self._SECURITY_FRAMEWORK.CFRelease(keychain_ref)
+
+        # Failed to get keychain status.
+        if status != 0:
+            return True
+
+        return not (
+            keychain_status.value & self._KEYCHAIN_STATUS_UNLOCKED_BIT
+        )
 
     def generate_account_qrcode(self, account, filename):
         absolute_filename = os.path.expanduser(filename)
